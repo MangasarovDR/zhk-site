@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+<meta name="description" content="{{ description }}">
+<link rel="canonical" href="{{ cfg.base_url }}{{ path }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ cfg.brand }}">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:url" content="{{ cfg.base_url }}{{ path }}">
+<meta property="og:locale" content="ru_RU">
+<link rel="stylesheet" href="/static/site.css?v={{ build_id }}">
+{% if jsonld %}<script type="application/ld+json">{{ jsonld | safe }}</script>{% endif %}
+{% if cfg.metrika_id %}<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym({{ cfg.metrika_id }},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true});</script>{% endif %}
+</head>
+<body>
+<header class="site-head"><div class="wrap">
+  <a class="brand" href="/">{{ cfg.brand_html | safe }}</a>
+  <nav class="nav"><a href="/#goroda">Города</a><a href="/metodika/">Как мы считаем</a></nav>
+</div></header>
+<main><div class="wrap">
+{% block main %}{% endblock %}
+</div></main>
+<footer class="site-foot"><div class="wrap">
+  Данные — открытые чаты жильцов в Telegram. Мы считаем, на что жильцы жалуются и за что хвалят свой ЖК,
+  и не публикуем ни сообщений, ни имён. Это не оценка ЖК и не реклама застройщика. Обновлено {{ updated }}.
+  <a href="/metodika/">Как мы считаем</a>
+</div></footer>
+</body>
+</html>

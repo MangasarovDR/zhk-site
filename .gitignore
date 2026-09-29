@@ -1,0 +1,13 @@
+# Секреты и ключи
+.env
+data/config.json
+
+# Данные — живой продукт, не код
+data/
+
+# Координация unlazy, рантайм
+.unlazy/
+out/
+__pycache__/
+*.pyc
+.venv/

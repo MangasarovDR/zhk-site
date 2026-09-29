@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="crumbs"><a href="/">Главная</a> › <a href="/{{ z.city_slug }}/">{{ z.city }}</a> › ЖК {{ z.name }}</div>
+<h1 data-zhk="{{ z.id }}">ЖК {{ z.name }}: на что жалуются жильцы</h1>
+<p class="lead">{{ z.address }}</p>
+
+<div class="card">
+<dl class="facts">
+  <div><dt>Застройщик</dt><dd>{% if z.brand %}{{ z.brand }}{% if z.brand_place %}<span class="src">место {{ z.brand_place }} в рейтинге ЕРЗ по России</span>{% endif %}{% if z.developers %}<span class="src">{{ z.developers }}</span>{% endif %}{% elif z.developer_base %}{{ z.developer_base }}{% else %}застройщик не найден в ЕРЗ{% endif %}</dd></div>
+  <div><dt>Управляющая компания</dt><dd>{% if z.uk %}{{ z.uk }}<span class="src">по упоминаниям жильцов в чатах</span>{% else %}УК не указана в реестрах{% endif %}</dd></div>
+  {% if z.date_end %}<div><dt>Срок сдачи (ЕРЗ)</dt><dd>{{ z.date_end }}</dd></div>{% endif %}
+  <div><dt>Чаты за 30 дней</dt><dd>{{ z.msgs_line }}<span class="src">{{ z.chats }} {{ z.chats_word }} в нашей базе</span></dd></div>
+</dl>
+</div>
+
+{% if z.insight %}<div class="insight">{{ z.insight | safe }}</div>{% endif %}
+
+<section class="card">
+  <h2>Жалобы и похвала по темам за 30 дней</h2>
+  <p class="note">Длина полосы — сколько сообщений о теме, цвет — их тон. Число справа — жалобы. Реклама, объявления и вакансии не считаются.</p>
+  {{ z.bars | safe }}
+  <details class="table-view"><summary>Таблица</summary><div class="tbl-wrap"><table>
+    <thead><tr><th>Тема</th><th class="num">Жалобы</th><th class="num">Похвала</th><th class="num">Нейтрально</th><th class="num">Всего</th><th class="num">Доля жалоб</th></tr></thead>
+    <tbody>{% for t in z.topics %}<tr><td>{{ t.label }}</td><td class="num">{{ t.n_neg }}</td><td class="num">{{ t.n_pos }}</td><td class="num">{{ t.n_neu }}</td><td class="num">{{ t.n_30d }}</td><td class="num">{{ t.neg_share }}</td></tr>{% endfor %}</tbody>
+  </table></div></details>
+</section>
+
+<div class="cols">
+<section class="card">
+  <h2>На что жалуются</h2>
+  {% if z.neg_list %}<ol class="tone-list">{% for t in z.neg_list %}<li><span>{{ t.label }}</span><span class="num">{{ t.n }} {{ t.word }}</span></li>{% endfor %}</ol>
+  {% else %}<p class="note">За 30 дней жалоб в чатах не было.</p>{% endif %}
+</section>
+<section class="card">
+  <h2>За что хвалят</h2>
+  {% if z.pos_list %}<ol class="tone-list">{% for t in z.pos_list %}<li><span>{{ t.label }}</span><span class="num">{{ t.n }} {{ t.word }}</span></li>{% endfor %}</ol>
+  {% else %}<p class="note">За 30 дней похвалы в чатах не было. Жильцы чаще пишут, когда что-то сломалось, чем когда всё работает.</p>{% endif %}
+</section>
+</div>
+
+<section class="card">
+  <h2>Жалоб больше или меньше, чем в других ЖК: {{ z.city }}</h2>
+  {% if z.ranked %}
+  <p class="note">Точка — место ЖК среди {{ z.city_total }} комплексов города по доле жалоб на тему среди всех сообщений чата. Левый край — жалуются реже всех, правый — чаще всех.</p>
+  {{ z.dots | safe }}
+  <details class="table-view"><summary>Таблица</summary><div class="tbl-wrap"><table>
+    <thead><tr><th>Тема</th><th class="num">Место</th><th class="num">Жалуются чаще, чем в</th></tr></thead>
+    <tbody>{% for t in z.ranked %}<tr><td>{{ t.label }}</td><td class="num">{{ t.city_rank }} из {{ t.city_total }}</td><td class="num">{{ t.pct }}% ЖК</td></tr>{% endfor %}</tbody>
+  </table></div></details>
+  {% else %}
+  <p class="note">Для сравнения с другими ЖК нужно от 100 сообщений в месяц или хотя бы пять таких комплексов в городе. Здесь пока меньше.</p>
+  {% endif %}
+</section>
+
+{% if z.trend %}
+<section class="card">
+  <h2>На этой неделе</h2>
+  <ul class="trend">{% for t in z.trend %}<li>{{ t | safe }}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Чаты ЖК {{ z.name }}</h2>
+  <p>В нашей базе {{ z.chats }} {{ z.chats_word }} жильцов этого комплекса. Ссылки на все — в Telegram-боте.</p>
+  {% if cfg.bot_username %}<a class="cta" href="https://t.me/{{ cfg.bot_username }}?start=z{{ z.id }}">Открыть чаты в Telegram</a>
+  {% else %}<span class="cta off">Бот с чатами подключается</span>{% endif %}
+</section>
+
+{% if z.same_dev %}
+<section class="card"><h2>Другие ЖК застройщика</h2>
+<ul class="chips">{% for o in z.same_dev %}<li><a href="{{ o.url }}">{{ o.name }}</a></li>{% endfor %}</ul></section>
+{% endif %}
+{% if z.nearby %}
+<section class="card"><h2>Другие ЖК: {{ z.city }}</h2>
+<ul class="chips">{% for o in z.nearby %}<li><a href="{{ o.url }}">{{ o.name }}</a></li>{% endfor %}</ul></section>
+{% endif %}
+{% endblock %}

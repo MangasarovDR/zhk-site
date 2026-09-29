@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block main %}
+<h1>На что жалуются жильцы ЖК — по их собственным чатам</h1>
+<p class="lead">{{ total_fmt }} ЖК в {{ n_cities }} {{ cities_word }}. Мы читаем открытые чаты жильцов и считаем, на что там жалуются и за что хвалят: УК, протечки, лифты, шум, парковка. Без рекламы застройщика.</p>
+
+<div class="card">
+  <label for="q"><h2>Найти ЖК</h2></label>
+  <input id="q" class="search" type="search" placeholder="Название комплекса" autocomplete="off">
+  <ul id="results" class="results"></ul>
+</div>
+
+{% if r0 %}
+<section class="card" id="reiting">
+<h2>Где больше и меньше жалоб</h2>
+<div class="sorter" data-rating hidden>
+  <label>Город <select id="r-city">{% for c in rating %}<option value="{{ c.s }}">{{ c.c }}</option>{% endfor %}</select></label>
+  <label>Тема <select id="r-key">{% for k, label in sort_opts %}<option value="{{ k }}">{{ label }}</option>{% endfor %}</select></label>
+  <div class="dir" role="group" aria-label="Порядок">
+    <button type="button" data-dir="desc" aria-pressed="true">Больше</button><button type="button" data-dir="asc" aria-pressed="false">Меньше</button>
+  </div>
+</div>
+<ol class="rating" id="r-list">{% for o in rating_first %}<li><a href="{{ o.url }}">{{ o.name }}</a><span class="num">{{ o.share }}</span></li>{% endfor %}</ol>
+<p class="note">Доля сообщений чата с жалобой за 30 дней. Только ЖК, где за месяц 100 сообщений и больше. <a id="r-all" href="/{{ r0.s }}/">Все ЖК: <span id="r-city-name">{{ r0.c }}</span></a></p>
+</section>
+{% endif %}
+
+<section class="card" id="goroda">
+<h2>Города</h2>
+<ul class="chips">{% for c in cities %}<li><a href="/{{ c.slug }}/">{{ c.city }} · {{ c.n }}</a></li>{% endfor %}</ul>
+</section>
+<script src="/static/search.js?v={{ build_id }}" defer></script>
+<script src="/static/sort.js?v={{ build_id }}" defer></script>
+{% endblock %}

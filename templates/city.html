@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="crumbs"><a href="/">Главная</a> › {{ c.city }}</div>
+<h1>ЖК: {{ c.city }} — на что жалуются жильцы</h1>
+<p class="lead">{{ c.n }} ЖК с живыми чатами жильцов. Смотрите, на что там жалуются и за что хвалят, прежде чем покупать квартиру.</p>
+
+{% if c.tops %}
+<div class="cols">
+{% for top in c.tops %}
+<section class="card"><h2>«{{ top.label }}»: где больше всего жалоб</h2>
+<p class="note">Доля сообщений чата с жалобой на эту тему за 30 дней. Только ЖК со 100+ сообщениями.</p>
+<table class="mini"><tbody>{% for o in top.entries %}<tr><td>{{ loop.index }}. <a href="{{ o.url }}">{{ o.name }}</a></td><td class="num">{{ o.share }}</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endfor %}
+</div>
+{% endif %}
+
+<section class="card" id="vse">
+<h2>Все ЖК: {{ c.city }}</h2>
+{% if c.n_big >= 2 %}
+<div class="sorter" data-sorter hidden>
+  <label class="sort-by">Сортировать <select id="sort-key">
+    <option value="msgs">по числу сообщений</option>
+    {% for k, label in c.sort_opts %}<option value="{{ k }}">{{ label }}</option>{% endfor %}
+  </select></label>
+  <div class="dir" role="group" aria-label="Порядок">
+    <button type="button" data-dir="desc" aria-pressed="true">Больше</button><button type="button" data-dir="asc" aria-pressed="false">Меньше</button>
+  </div>
+</div>
+<p class="note" id="sort-note" hidden></p>
+{% endif %}
+<div class="tbl-wrap"><table id="zhk-table" data-keys="{{ c.sort_keys }}" data-min="{{ c.min_msgs }}">
+<thead><tr><th>ЖК</th><th class="c-top">Больше всего жалоб</th><th class="num" data-share hidden>Доля жалоб</th><th class="num">Сообщений за 30 дней</th></tr></thead>
+<tbody>{% for o in c.entries %}<tr data-m="{{ o.msgs }}" data-v="{{ o.vals }}"{% if o.small %} data-small{% endif %}><td><a href="{{ o.url }}">{{ o.name }}</a>{% if o.district %}<br><span class="note">{{ o.district }}</span>{% endif %}</td><td class="c-top">{{ o.top_topic }}</td><td class="num" data-share hidden></td><td class="num">{{ o.msgs_fmt }}</td></tr>{% endfor %}</tbody>
+</table></div>
+</section>
+<script src="/static/sort.js?v={{ build_id }}" defer></script>
+{% endblock %}
